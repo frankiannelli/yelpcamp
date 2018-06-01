@@ -1,13 +1,28 @@
 let express = require("express"),
     app = express(),
     bodyParser = require("body-parser"),
-    mongoose = require("mongoose")
-    Campground = require("./models/campground")
-    seedDB = require("./seeds")
-    Comment = require("./models/comment")
+    mongoose = require("mongoose"),
+    passport = require("passport"),
+    LocalStrategy = require("passport-local"),
+    Campground = require("./models/campground"),
+    Comment = require("./models/comment"),
+    seedDB = require("./seeds"),
+    User = require("./models/user")
 
 seedDB();
 mongoose.connect("mongodb://localhost/yelp_camp");
+
+//passport setup
+app.use(require("express-session")({
+    secret: "rusty is the best dog",
+    resave: false,
+    saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 // Campground.create(
 //     {
